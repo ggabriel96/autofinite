@@ -5,6 +5,23 @@
 NDFA ndfa;
 vector<string> tokens;
 
+struct enumstate{
+  vector<char> name;
+  string s;
+  enumstate() { incremento();  }
+  void operator++() { incremento(); }
+  void incremento() {
+    int i;
+    do {
+      for (i = 0; i < (int)name.size(); i++)
+        if (name[i] < 'Z') { name[i]++; break; }
+        else name[i] = 'A';
+      if (i == (int)name.size()) name.push_back('A');
+      s = string(name.begin(), name.end());
+    } while(ndfa.find(s) != ndfa.end());
+  }
+};
+
 void debugprint() {
   for (NDFA::iterator src = ndfa.begin(); src != ndfa.end(); src++) {
     printf("%s ", (src -> first).c_str());
@@ -48,10 +65,16 @@ int readgrammar() {
 
 int readtokens() {
   char word[MAX];
+  enumstate current;
   while (fgets(word, MAX, stdin) != NULL) {
     word[strlen(word) - 1] = '\0';
     tokens.push_back(string(word));
     printf("%s\n", word);
+  }
+  for (int i = 0; i < 30; ++current, i++) {
+    for (int j = 0; j < (int)current.name.size(); j++)
+      putchar(current.name[j]);
+    putchar('\n');
   }
   return 1;
 }

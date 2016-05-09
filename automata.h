@@ -2,6 +2,7 @@
 #include <vector>
 #include <map>
 using namespace std;
+
 typedef map<char, vector<string> > transition;
 typedef map<string, transition> NDFA;
 
