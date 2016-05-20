@@ -9,5 +9,6 @@ int main(void) {
     printf("Invalid input\n"); break;
   }
   debugprint();
+  makedet();
   return 0;
 }
