@@ -13,6 +13,7 @@ typedef map<string, ntransition> NDFA;
 #define X "X"
 
 void debugprint();
+void debugd();
 
 // Read the grammar and build the NDFA
 int readgrammar();

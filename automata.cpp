@@ -35,6 +35,15 @@ void debugprint() {
   }
 }
 
+void debugd() {
+  for (DFA::iterator src = dfa.begin(); src != dfa.end(); src++) {
+    printf("%s ", (src -> first).c_str());
+    for (dtransition::iterator tgt = (src -> second).begin(); tgt != (src -> second).end(); tgt++)
+        printf("(%c, %s)", tgt -> first, (tgt -> second).c_str());
+    printf("\n");
+  }
+}
+
 int readgrammar() {
   int i, top;
   string src, tgt;
@@ -54,7 +63,7 @@ int readgrammar() {
     //    i = j + 1;
     i += 2;
     src = string(word);
-    //    printf("%s ::= ", states[src].c_str());
+    printf("%s ::= ", states[src].c_str());
     if (states.find(src) == states.end()) states[src] = state++;
     while (s[++i] != '\0') {
       for (top = flag = 0; s[i] != '|'; i++) {
@@ -68,11 +77,12 @@ int readgrammar() {
       tgt = string(word);
       if (states.find(tgt) == states.end()) states[tgt] = state++;
       ndfa[states[src]][term].push_back(states[tgt]);
-      //      printf("%c%s%s", term, states[tgt].c_str(), s[i + 1] == '\0' ? "\n" : " | ");
+      printf("%c%s%s", term, states[tgt].c_str(), s[i + 1] == '\0' ? "\n" : " | ");
     }
     printf("\n");
   }
   src = states[""];
+  printf("readgrammar X: %s\n", src.c_str());
   for (i = 33; i < 127; i++)
     ndfa[src][(char) i].push_back(X);
   return 1;
@@ -93,23 +103,47 @@ int readtokens(int N) {
     ndfa[S][word[0]].push_back(current.name);
     for (i = 1; word[i] != '\0'; i++)
       ndfa[current++][word[i]].push_back(current.name);
+    printf("readtokens X: %s\n", current.name.c_str());
     for (i = 33; i < 127; i++)
       ndfa[current.name][(char) i].push_back(X);
+    current++;
   }
   return 1;
 }
 
 void makedet() {
-  for (NDFA::iterator src = ndfa.begin(); src != ndfa.end(); src++) {
-    printf("%s\n", (src -> first).c_str());
-    for (ntransition::iterator tgt = (src -> second).begin(); tgt != (src -> second).end(); tgt++) {
-      string dtgt;
-      printf("%c: ", tgt -> first);
-      for (int i = 0; i < (int) (tgt -> second).size(); i++) {
-        dtgt.append("<").append((tgt -> second)[i].c_str()).append(">");
+  int i, j, k;
+  vector<string> states;
+  states.push_back("S|");
+  for (i = 0; i < (int) states.size(); i++) {
+    j = 0;
+    string src;
+    set<string> z;
+    vector<string> trans(312, "");
+    while (j < (int) states[i].length()) {
+      k = j;
+      while (states[i][j++] != '|');
+      src = states[i].substr(k, j - k - 1);
+      //printf("src: %s\n", src.c_str());
+      for (ntransition::iterator t = ndfa[src].begin(); t != ndfa[src].end(); t++) {
+        string tgt;
+        printf("\nt -> first %c\n", t -> first);
+        for (k = 0; k < (int) (t -> second).size(); k++) {
+          printf("%s, %d\n", (t -> second)[k].c_str(), z.find((t -> second)[k]) == z.end());
+          if (z.insert((t -> second)[k]).second == true) {
+            tgt.append((t -> second)[k]).append("|");
+            printf("tgt %s\n", tgt.c_str());
+          }
+        }
+        trans[(int) t -> first].append(tgt);
+        printf("final tgt %s\n", trans[(int) t -> first].c_str());
+        //printf("%s\n", tgt.c_str());
       }
-      printf("%s\n", dtgt.c_str());
     }
-    printf("\n");
+    for (j = 0; j < 312; j++) {
+      if (trans[j].length() == 0) continue;
+      dfa[states[i]][(char) j] = trans[j];
+      states.push_back(trans[j]);
+    }
   }
 }
