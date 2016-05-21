@@ -118,32 +118,25 @@ void makedet() {
   for (i = 0; i < (int) states.size(); i++) {
     j = 0;
     string src;
-    set<string> z;
-    vector<string> trans(312, "");
+    vector< set<string> > trans(312);
     while (j < (int) states[i].length()) {
       k = j;
       while (states[i][j++] != '|');
       src = states[i].substr(k, j - k - 1);
-      //printf("src: %s\n", src.c_str());
       for (ntransition::iterator t = ndfa[src].begin(); t != ndfa[src].end(); t++) {
         string tgt;
-        printf("\nt -> first %c\n", t -> first);
-        for (k = 0; k < (int) (t -> second).size(); k++) {
-          printf("%s, %d\n", (t -> second)[k].c_str(), z.find((t -> second)[k]) == z.end());
-          if (z.insert((t -> second)[k]).second == true) {
-            tgt.append((t -> second)[k]).append("|");
-            printf("tgt %s\n", tgt.c_str());
-          }
-        }
-        trans[(int) t -> first].append(tgt);
-        printf("final tgt %s\n", trans[(int) t -> first].c_str());
-        //printf("%s\n", tgt.c_str());
+        for (k = 0; k < (int) (t -> second).size(); k++)
+          tgt.append((t -> second)[k]).append("|");
+        trans[(int) t -> first].insert(tgt);
       }
     }
     for (j = 0; j < 312; j++) {
-      if (trans[j].length() == 0) continue;
-      dfa[states[i]][(char) j] = trans[j];
-      states.push_back(trans[j]);
+      string tr;
+      if (trans[j].size() == 0) continue;
+      for (set<string>::iterator s = trans[j].begin(); s != trans[j].end(); s++)
+        tr.append(*s);
+      dfa[states[i]][(char) j] = tr;
+      states.push_back(tr);
     }
   }
 }
