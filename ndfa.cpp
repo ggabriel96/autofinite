@@ -8,8 +8,11 @@ int main(void) {
     if (readgrammar()) continue;
     printf("Invalid input\n"); break;
   }
-  makedet();
+  printf("IIIIIIII222222\n");
   debugprint();
+  makedet();
+  printf("IIIIIIIIIIII\n");
+  // debugprint();
   printf("\n----------------\n");
   debugd();
   debugf();

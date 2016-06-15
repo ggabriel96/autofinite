@@ -1,12 +1,12 @@
 #include <set>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "automata.h"
 
 DFA dfa;
 NDFA ndfa;
-set<string> tokens;
-set<string> final, ok;
+set<string> tokens, final;
 
 struct enumstate {
   string name;
@@ -83,7 +83,7 @@ int readgrammar() {
     printf("\n");
   }
   src = states[""]; final.insert(src); //scr is a final state
-  printf("readgrammar X: %s\n", src.c_str());
+  printf("final state: %s\n", src.c_str());
   for (i = 33; i < 127; i++)
     ndfa[src][(char) i].push_back(X);
   return 1;
@@ -116,21 +116,26 @@ int readtokens(int N) {
 void debugf() {
   printf("\n\nEstados finais:\n");
   for (set<string>::iterator i = final.begin(); i != final.end(); i++)
-    printf("%s\n", i->c_str());
+    printf("%s\n", i -> c_str());
 }
 
 void makedet() {
   int i, j, k;
+  set<string> done;
   vector<string> states;
-  states.push_back("S|");
+  states.push_back("S|"); done.insert("S|");
   for (i = 0; i < (int) states.size(); i++) {
     j = 0;
     string src;
     vector< set<string> > trans(312);
     while (j < (int) states[i].length()) {
       k = j;
+      // searching for the first '|' in order to
+      // find the 'src' state to look at its transitions
+      // 'j' stops 1 position after that '|'
       while (states[i][j++] != '|');
       src = states[i].substr(k, j - k - 1);
+      if (final.find(src) != final.end()) continue;
       for (ntransition::iterator t = ndfa[src].begin(); t != ndfa[src].end(); t++) {
         string tgt;
         for (k = 0; k < (int) (t -> second).size(); k++)
@@ -144,9 +149,19 @@ void makedet() {
       for (set<string>::iterator s = trans[j].begin(); s != trans[j].end(); s++)
         tr.append(*s);
       dfa[states[i]][(char) j] = tr;
-      states.push_back(tr);
+      if (done.find(tr) == done.end()) {
+        states.push_back(tr);
+        done.insert(tr);
+      }
     }
   }
+  // for (auto fs: final) {
+  // for (set<string>::iterator fs = final.begin(); fs != final.end(); fs++) {
+  //   printf("+++++++++++++++= %s\n", fs -> c_str());
+  //   for (auto s: dfa) {
+  //     printf("%s\n", s.first.c_str());
+  //   }
+  // }
 }
 
 int minimize(string u) {
