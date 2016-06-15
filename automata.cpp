@@ -6,6 +6,7 @@
 DFA dfa;
 NDFA ndfa;
 set<string> tokens;
+set<string> final, ok;
 
 struct enumstate {
   string name;
@@ -81,7 +82,7 @@ int readgrammar() {
     }
     printf("\n");
   }
-  src = states[""];
+  src = states[""]; final.insert(src); //scr is a final state
   printf("readgrammar X: %s\n", src.c_str());
   for (i = 33; i < 127; i++)
     ndfa[src][(char) i].push_back(X);
@@ -106,9 +107,16 @@ int readtokens(int N) {
     printf("readtokens X: %s\n", current.name.c_str());
     for (i = 33; i < 127; i++)
       ndfa[current.name][(char) i].push_back(X);
+    final.insert(current.name);
     current++;
   }
   return 1;
+}
+
+void debugf() {
+  printf("\n\nEstados finais:\n");
+  for (set<string>::iterator i = final.begin(); i != final.end(); i++)
+    printf("%s\n", i->c_str());
 }
 
 void makedet() {
@@ -139,4 +147,13 @@ void makedet() {
       states.push_back(tr);
     }
   }
+}
+
+int minimize(string u) {
+  int i; bool flag = false, tmp;
+  for (i = 33; i < 127; i++, flag |= !tmp)
+    if ((tmp = !minimize(dfa[u][(char) i]))) dfa[u][(char) i] = X;
+  if (final.find(u) != final.end() || flag) return 1;
+  dfa.erase(u);
+  return 0;
 }

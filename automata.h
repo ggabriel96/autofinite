@@ -14,6 +14,7 @@ typedef map<string, ntransition> NDFA;
 
 void debugprint();
 void debugd();
+void debugf();
 
 // Read the grammar and build the NDFA
 int readgrammar();
@@ -23,3 +24,5 @@ int readtokens(int);
 
 // Make the automaton nondeterministic
 void makedet();
+
+int minimize(string);

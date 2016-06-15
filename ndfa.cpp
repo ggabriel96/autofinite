@@ -12,5 +12,7 @@ int main(void) {
   debugprint();
   printf("\n----------------\n");
   debugd();
+  debugf();
+  minimize(S);
   return 0;
 }
