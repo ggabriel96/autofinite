@@ -155,17 +155,19 @@ void makedet() {
       }
     }
   }
-  // for (auto fs: final) {
-  // for (set<string>::iterator fs = final.begin(); fs != final.end(); fs++) {
-  //   printf("+++++++++++++++= %s\n", fs -> c_str());
-  //   for (auto s: dfa) {
-  //     printf("%s\n", s.first.c_str());
-  //   }
-  // }
+  done.clear();
+  for (auto fs: final) {
+    for (auto s: dfa)
+      if (s.first.find(fs))
+        done.insert(s.first);
+    final.erase(fs);
+  }
+  for (auto s: done) final.insert(s);
 }
 
 int minimize(string u) {
-  int i; bool flag = false, tmp;
+  int i;
+  bool flag = false, tmp;
   for (i = 33; i < 127; i++, flag |= !tmp)
     if ((tmp = !minimize(dfa[u][(char) i]))) dfa[u][(char) i] = X;
   if (final.find(u) != final.end() || flag) return 1;
