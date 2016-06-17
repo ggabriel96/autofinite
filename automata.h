@@ -25,5 +25,4 @@ int readtokens(int);
 // Make the automaton nondeterministic
 void makedet();
 
-int minimize(string);
-void remove();
+void minimize();

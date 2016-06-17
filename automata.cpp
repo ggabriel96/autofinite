@@ -166,16 +166,7 @@ void makedet() {
   debugf();
 }
 
-void remove() {
-  for (auto& u: dfa)
-    for (auto& v: u.second)
-      //if (!s.compare(v.second))
-      if (dfa.find(v.second) == dfa.end())
-        u.second.erase(v.first);
-}
-
 set<string> ok;
-
 int minimize(string u) {
   bool flag = false;
   ok.insert(u);
@@ -186,4 +177,17 @@ int minimize(string u) {
   if (final.find(u) != final.end()) flag = true;
   if (flag == false) { dfa.erase(u); /*remove(u); NA MAIN*/ }
   return flag;
+}
+
+void remove() {
+  for (auto& u: dfa)
+    for (auto& v: u.second)
+      //if (!s.compare(v.second))
+      if (dfa.find(v.second) == dfa.end())
+        u.second.erase(v.first);
+}
+
+void minimize() {
+  minimize("S|");
+  remove();
 }

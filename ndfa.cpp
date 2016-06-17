@@ -13,8 +13,7 @@ int main(void) {
   printf("\n----------------\n");
   debugd();
   debugf();
-  minimize("S|");
-  remove();
+  minimize();
   debugd();
   return 0;
 }
