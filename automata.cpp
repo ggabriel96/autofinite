@@ -50,7 +50,7 @@ int readgrammar() {
   string src, tgt;
   enumstate state;
   map<string, string> states;
-  char s[MAX], word[MAX], flag, term;
+  char s[MAX], word[MAX], flag, term = 0;
   states[S] = S; states[X] = X;
   while (fgets(s, MAX, stdin) != NULL && strlen(s) > 1) {
     s[strlen(s) - 1] = '|';
@@ -146,8 +146,8 @@ void makedet() {
     for (j = 0; j < 312; j++) {
       string tr;
       if (trans[j].size() == 0) continue;
-      for (set<string>::iterator s = trans[j].begin(); s != trans[j].end(); s++)
-        tr.append(*s);
+      for (auto& s: trans[j])
+        tr.append(s);
       dfa[states[i]][(char) j] = tr;
       if (done.find(tr) == done.end()) {
         states.push_back(tr);
@@ -156,21 +156,32 @@ void makedet() {
     }
   }
   done.clear();
-  for (auto fs: final) {
-    for (auto s: dfa)
-      if (s.first.find(fs))
+  for (auto& fs: final) {
+    for (auto& s: dfa)
+      if (s.first.find(fs) != string::npos)
         done.insert(s.first);
     final.erase(fs);
   }
-  for (auto s: done) final.insert(s);
+  for (auto& s: done) final.insert(s);
+  debugf();
 }
 
+void remove(string s) {
+  for (auto& u: dfa)
+    for (auto& v: u.second)
+      if (!s.compare(v.second))
+        u.second.erase(v.first);
+}
+
+set<string> ok;
 int minimize(string u) {
-  int i;
-  bool flag = false, tmp;
-  for (i = 33; i < 127; i++, flag |= !tmp)
-    if ((tmp = !minimize(dfa[u][(char) i]))) dfa[u][(char) i] = X;
-  if (final.find(u) != final.end() || flag) return 1;
-  dfa.erase(u);
-  return 0;
+  bool flag = false;
+  ok.insert(u);
+  for (auto& v: dfa[u])
+    if (ok.find(v.second) == ok.end())
+      flag |= minimize(v.second);
+    else flag |= (dfa.find(v.second) != dfa.end() && v.second.compare(u));
+  if (final.find(u) != final.end()) flag = true;
+  if (flag == false) { dfa.erase(u); remove(u); }
+  return flag;
 }
