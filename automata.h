@@ -26,3 +26,4 @@ int readtokens(int);
 void makedet();
 
 int minimize(string);
+void remove();

@@ -14,6 +14,7 @@ int main(void) {
   debugd();
   debugf();
   minimize("S|");
+  remove();
   debugd();
   return 0;
 }
