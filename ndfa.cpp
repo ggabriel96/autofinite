@@ -10,17 +10,12 @@ int main(void) {
   }
   printf("Autômato original:\n");
   debugprint();
-  makedet();
   printf("\n----------------\nAutômato determinizado:\n");
+  makedet();
   debugd();
-<<<<<<< HEAD
-  minimize("S|");
-  remove();
-  printf("\n----------------\nAutômato minimizado:\n");
-=======
-  debugf();
   minimize();
->>>>>>> f57bafd0c029848c5caac6129a1f0717941b5f5d
+  printf("\n----------------\nAutômato minimizado:\n");
+  minimize();
   debugd();
   fill();
   csv();
