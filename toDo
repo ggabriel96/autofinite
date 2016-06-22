@@ -1,6 +1,0 @@
-- Validate input
-- Make deterministic
-- Minimize
-
-Bugs:
-- While reading the grammar, we don't add the 'target' state to the map... This can mess up with the enum increment
