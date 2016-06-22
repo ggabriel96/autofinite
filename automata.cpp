@@ -59,9 +59,6 @@ int readgrammar() {
       word[top++] = s[i];
     }
     word[top] = '\0';
-    //    for (j = i + 1; word[j] != '='; j++);
-    //    if (j - i != 2) return 0;
-    //    i = j + 1;
     i += 2;
     src = string(word);
     if (states.find(src) == states.end()) states[src] = state++;
@@ -159,13 +156,6 @@ void makedet() {
   for (auto& s: done) final.insert(s);
 }
 
-void remove() {
-  for (auto& u: dfa)
-    for (auto& v: u.second)
-      if (dfa.find(v.second) == dfa.end())
-        u.second.erase(v.first);
-}
-
 set<string> ok;
 int minimize(string u) {
   bool flag = false;
@@ -177,6 +167,18 @@ int minimize(string u) {
   if (final.find(u) != final.end()) flag = true;
   if (flag == false) dfa.erase(u);
   return flag;
+}
+
+void remove() {
+  for (auto& u: dfa)
+    for (auto& v: u.second)
+      if (dfa.find(v.second) == dfa.end())
+        u.second.erase(v.first);
+}
+
+void minimize() {
+  minimize("S|");
+  remove();
 }
 
 void fill() {
