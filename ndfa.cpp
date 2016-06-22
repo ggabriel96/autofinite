@@ -8,13 +8,16 @@ int main(void) {
     if (readgrammar()) continue;
     printf("Invalid input\n"); break;
   }
+  printf("Autômato original:\n");
   debugprint();
   makedet();
-  printf("\n----------------\n");
+  printf("\n----------------\nAutômato determinizado:\n");
   debugd();
-  debugf();
   minimize("S|");
   remove();
+  printf("\n----------------\nAutômato minimizado:\n");
   debugd();
+  fill();
+  csv();
   return 0;
 }

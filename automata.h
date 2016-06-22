@@ -15,6 +15,8 @@ typedef map<string, ntransition> NDFA;
 void debugprint();
 void debugd();
 void debugf();
+void fill();
+void csv();
 
 // Read the grammar and build the NDFA
 int readgrammar();

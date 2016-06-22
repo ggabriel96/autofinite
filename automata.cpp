@@ -64,7 +64,6 @@ int readgrammar() {
     //    i = j + 1;
     i += 2;
     src = string(word);
-    printf("%s ::= ", states[src].c_str());
     if (states.find(src) == states.end()) states[src] = state++;
     while (s[++i] != '\0') {
       for (top = flag = 0; s[i] != '|'; i++) {
@@ -78,12 +77,9 @@ int readgrammar() {
       tgt = string(word);
       if (states.find(tgt) == states.end()) states[tgt] = state++;
       ndfa[states[src]][term].push_back(states[tgt]);
-      printf("%c%s%s", term, states[tgt].c_str(), s[i + 1] == '\0' ? "\n" : " | ");
     }
-    printf("\n");
   }
   src = states[""]; final.insert(src); //scr is a final state
-  printf("final state: %s\n", src.c_str());
   for (i = 33; i < 127; i++)
     ndfa[src][(char) i].push_back(X);
   return 1;
@@ -100,11 +96,9 @@ int readtokens(int N) {
     // successfully inserted that key or it was
     // already there (and thus did nothing), respectively
     if (!tokens.insert(string(word)).second) continue;
-    printf("%s\n", word);
     ndfa[S][word[0]].push_back(current.name);
     for (i = 1; word[i] != '\0'; i++)
       ndfa[current++][word[i]].push_back(current.name);
-    printf("readtokens X: %s\n", current.name.c_str());
     for (i = 33; i < 127; i++)
       ndfa[current.name][(char) i].push_back(X);
     final.insert(current.name);
@@ -163,19 +157,16 @@ void makedet() {
     final.erase(fs);
   }
   for (auto& s: done) final.insert(s);
-  debugf();
 }
 
 void remove() {
   for (auto& u: dfa)
     for (auto& v: u.second)
-      //if (!s.compare(v.second))
       if (dfa.find(v.second) == dfa.end())
         u.second.erase(v.first);
 }
 
 set<string> ok;
-
 int minimize(string u) {
   bool flag = false;
   ok.insert(u);
@@ -184,6 +175,35 @@ int minimize(string u) {
       flag |= minimize(v.second);
     else flag |= (dfa.find(v.second) != dfa.end() && v.second.compare(u));
   if (final.find(u) != final.end()) flag = true;
-  if (flag == false) { dfa.erase(u); /*remove(u); NA MAIN*/ }
+  if (flag == false) dfa.erase(u);
   return flag;
+}
+
+void fill() {
+  char c;
+  dtransition x;
+  for (c = 33; c < 127; c++) x[c] = "X|";
+  dfa["X|"] = x;
+  for (auto& s: dfa)
+    for (c = 33; c < 127; c++)
+      if (s.second.find(c) == s.second.end())
+        s.second[c] = "X|";
+}
+
+void csv(void) {
+  char c;
+  FILE *f = fopen("automata.csv", "w");
+  fprintf(f, "State");
+  for (c = 33; c < 127; c++) {
+    if (c == '"') fprintf(f, " \"\"\"\"");
+    else if (c == ',') fprintf(f, " \",\"");
+    else fprintf(f, " %c", c);
+  }
+  for (auto& s: dfa) {
+    fprintf(f, "\n%s", s.first.c_str());
+    for (auto& t: s.second)
+      fprintf(f, " %s", t.second.c_str());
+  }
+  fprintf(f, "\n");
+  fclose(f);
 }
