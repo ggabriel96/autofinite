@@ -27,20 +27,29 @@ struct enumstate {
 };
 
 void debugprint() {
-  for (NDFA::iterator src = ndfa.begin(); src != ndfa.end(); src++) {
-    printf("%s ", (src -> first).c_str());
-    for (ntransition::iterator tgt = (src -> second).begin(); tgt != (src -> second).end(); tgt++)
-      for (int i = 0; i < (int) (tgt -> second).size(); i++)
-        printf("(%c, %s)", tgt -> first, (tgt -> second)[i].c_str());
+  bool first;
+  for (auto& src: ndfa) {
+    first = true;
+    printf("<%s> ::= ", src.first.c_str());
+    for (auto& tgt: src.second) {
+      for (int i = 0; i < (int) tgt.second.size(); i++) {
+        if (!first) printf(" | "); first = false;
+        printf("%c<%s>", tgt.first, tgt.second[i].c_str());
+      }
+    }
     printf("\n");
   }
 }
 
 void debugd() {
-  for (DFA::iterator src = dfa.begin(); src != dfa.end(); src++) {
-    printf("%s ", (src -> first).c_str());
-    for (dtransition::iterator tgt = (src -> second).begin(); tgt != (src -> second).end(); tgt++)
-        printf("(%c, %s)", tgt -> first, (tgt -> second).c_str());
+  bool first;
+  for (auto& src: dfa) {
+    first = true;
+    printf("<%s> ::= ", src.first.c_str());
+    for (auto& tgt: src.second) {
+      if (!first) printf(" | "); first = false;
+      printf("%c<%s>", tgt.first, tgt.second.c_str());
+    }
     printf("\n");
   }
 }
