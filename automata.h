@@ -3,28 +3,40 @@
 #include <vector>
 using namespace std;
 
-typedef map<char, string> dtransition;
-typedef map<string, dtransition> DFA;
-typedef map<char, vector<string> > ntransition;
-typedef map<string, ntransition> NDFA;
-
 #define MAX 112345
+#define TERMINAL 1
+#define NTERMINAL 2
+#define EPS '&'
 #define S "S"
-#define X "X"
 
-void debugprint();
-void debugd();
-void debugf();
-void fill();
+struct symbol {
+  string t; int flag;
+  symbol() {}
+  symbol(char c) {
+    t = string(1, c);
+    flag = TERMINAL;
+  }
+  symbol(string s) {
+    t = s; flag = NTERMINAL;
+  }
+};
+
+struct transition {
+  vector<symbol> sym;
+  void append(char c) {
+    sym.push_back(symbol(c));
+  }
+  void append(string s) {
+    sym.push_back(symbol(s));
+  }
+};
+
+typedef map<string, vector<transition> > FA;
+
 void csv();
 
 // Read the grammar and build the NDFA
 int readgrammar();
-
-// Read the tokens and build the NDFA
-int readtokens(int);
-
-// Make the automaton nondeterministic
-void makedet();
-
-void minimize();
+void first();
+void follow();
+void printfa();

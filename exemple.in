@@ -1,17 +1,4 @@
-0
 <S> ::= a<AA> | b<B> | a<B> | a<C>
 <AA> ::= a | b
 <B> ::= b | c
 <C> ::= c | d<B>
-
-6
-if
-else
-for
-while
-continue
-break
-
-0
-<S> ::= a<AA>
-<AA> ::= a
