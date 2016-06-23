@@ -5,6 +5,11 @@ int main(void) {
   readgrammar();
   printf("\n------------------\n");
   printfa();
-  first(); follow(); csv();
+  printf("\n------------------\n");
+  first();
+  printfrst();
+  follow();
+  printf("\n------------------\n");
+  csv();
   return 0;
 }

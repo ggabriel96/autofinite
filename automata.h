@@ -38,5 +38,6 @@ void csv();
 // Read the grammar and build the NDFA
 int readgrammar();
 void first();
+void printfrst();
 void follow();
 void printfa();

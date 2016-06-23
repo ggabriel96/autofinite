@@ -6,7 +6,7 @@
 #include "automata.h"
 
 FA fa;
-map<string, set<char> > first, follow;
+map<string, set<char> > frst, fllw;
 
 int readgrammar() {
   int i, top;
@@ -56,45 +56,50 @@ void csv(void) {
 
 void first(void) {
   int i, j;
-  bool eps;
-  for (auto& s: fa) {
-    vector<transition> prod = s.second;
-    for (i = 0; i < (int) prod.size(); i++) {
-      // prod[i] é uma produção de s.first
-      // essa iteraçao com j não deve acontecer,
-      // pois devemos olhar, inicialmente,
-      // apenas para o primeiro símbolo da produção
-      // e apenas aos próximos em algumas condições abaixo
-      for (j = 0; j < (int) prod[i].sym.size(); j++) {
-        eps = false;
-        // aqui estamos iterando sobre todos
-        // os símbolos de uma produção
-        // 2 ou 6) se for terminal ou eps, adiciona ao first
-        if (prod[i].sym[j].flag == TERMINAL)
-          first[s.first].insert(prod[i].sym[j].t);
-        else {
-          // map<string, set<char> > first, follow;
-          // 3) se for não-terminal, olho pro first dele
-          for (auto& f: first[prod[i].sym[j].t]) {
-            // iterando sobre os chars do first
-            for (auto& sym: f.second) {
+  bool eps, done = false;
+  while (!done) {
+    done = true;
+    for (auto& s: fa) {
+      vector<transition> prod = s.second;
+      for (i = 0; i < (int) prod.size(); i++) {
+        // prod[i] é uma produção de s.first
+        for (j = 0; j < (int) prod[i].sym.size(); j++) {
+          eps = false;
+          // aqui estamos iterando sobre todos
+          // os símbolos de uma produção
+          // 2 ou 6) se for terminal ou eps, adiciona ao first
+          if (prod[i].sym[j].flag == TERMINAL) {
+            done &= !frst[s.first].insert(prod[i].sym[j].t.front()).second;
+            break;
+          } else {
+            // 3) se for não-terminal, olho pro first dele
+            for (auto& sym: frst[prod[i].sym[j].t]) {
+              // iterando sobre os chars do first
               // 5) se for eps, olhar para o próximo
               // símbolo de prod[i]
-              if (!sym.t.compare("&")) { eps = true; break; }
+              if (sym == '&') { eps = true; continue; }
               // 4) se for terminal (não eps), adicionar ao first
-              first[s.first].insert(sym.t);
+              done &= !frst[s.first].insert(sym).second;
             }
-            if (eps) break;
           }
+          // 7) se eu havia encontrado um eps e não
+          // há próximo símbolo, adiciona eps ao first
+          if (eps && j + 1 == (int) prod[i].sym.size())
+            done &= !frst[s.first].insert('&').second;
+          else if (!eps) break;
         }
-        // 7) se eu havia encontrado um eps e não
-        // há próximo símbolo, adiciona eps ao first
-        if (eps && j + 1 == (int) prod[i].sym.size())
-          first[s.first] = "&";
       }
     }
   }
-  return;
+}
+
+void printfrst() {
+  for (auto& s: frst) {
+    printf("%s = ", s.first.c_str());
+    for (auto& prod: s.second)
+      printf("%c, ", prod);
+    printf("\n");
+  }
 }
 
 void follow(void) {

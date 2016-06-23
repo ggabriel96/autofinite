@@ -1,0 +1,4 @@
+<S> ::= a<B>c | bc | <B><C>d | a
+<B> ::= b<D> | bc | &
+<C> ::= ac | <B>d | <D>c | &
+<D> ::= <B><C> | cd | ac | <C>e
