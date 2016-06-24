@@ -40,4 +40,5 @@ int readgrammar();
 void first();
 void printfrst();
 void follow();
+void printfllw();
 void printfa();

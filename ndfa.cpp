@@ -8,7 +8,9 @@ int main(void) {
   printf("\n------------------\n");
   first();
   printfrst();
+  printf("\n------------------\n");
   follow();
+  printfllw();
   printf("\n------------------\n");
   csv();
   return 0;
