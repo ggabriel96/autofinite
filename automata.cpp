@@ -103,7 +103,26 @@ void printfrst() {
 }
 
 void follow(void) {
-  return;
+  int i, j;
+  bool eps, done = false;
+  fllw[S].insert('$');
+  // 1ª etapa
+  for (auto& s: fa) {
+    vector<transition> prod = s.second;
+    for (i = 0; i < (int) prod.size(); i++) {
+      // prod[i] é uma produção de s.first
+      for (j = 0; j < (int) prod[i].sym.size() - 1; j++) {
+        // aqui estamos iterando sobre todos
+        // os símbolos de uma produção
+        if (prod[i].sym[j].flag == NTERMINAL) {
+          if (prod[i].sym[j + 1].flag == TERMINAL && prod[i].sym[j + 1].t.front() != '&')
+            fllw[s.first].insert(prod[i].sym[j + 1].t.front());
+          else if (prod[i].sym[j + 1].flag == NTERMINAL)
+            for (auto& f: frst) fllw[s.first].insert(f);
+        }
+      }
+    }
+  }
 }
 
 void printfa() {
