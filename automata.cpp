@@ -113,7 +113,7 @@ void follow(void) {
             fllw[prod[i].sym[j].t].insert(prod[i].sym[j + 1].t.front());
           else if (prod[i].sym[j + 1].flag == NTERMINAL)
             for (auto& f: frst[prod[i].sym[j + 1].t])
-              fllw[prod[i].sym[j].t].insert(f);
+              if (f != '&') fllw[prod[i].sym[j].t].insert(f);
         }}
   while (!done) {
     done = true;

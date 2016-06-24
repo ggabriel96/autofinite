@@ -12,6 +12,6 @@ int main(void) {
   follow();
   printfllw();
   printf("\n------------------\n");
-  csv();
+  // csv();
   return 0;
 }
