@@ -3,15 +3,14 @@
 
 int main(void) {
   readgrammar();
-  printf("\n------------------\n");
+  printf("Automaton:\n");
   printfa();
-  printf("\n------------------\n");
+  printf("\n------------------\nFirst set:\n");
   first();
   printfrst();
-  printf("\n------------------\n");
+  printf("\n------------------\nFollow set:\n");
   follow();
   printfllw();
-  printf("\n------------------\n");
-  // csv();
+  csv();
   return 0;
 }

@@ -21,7 +21,7 @@ int readgrammar() {
     word[top] = '\0';
     i += 2;
     src = string(word);
-    printf("%s ::= ", src.c_str());
+    // printf("%s ::= ", src.c_str());
     vector < transition > prod;
     while (s[++i] != '\0') {
       transition n;
@@ -31,26 +31,36 @@ int readgrammar() {
         else if (s[i] == '>') {
           word[top] = '\0'; flag = 0;
           n.append(string(word));
-          printf("%s", word);
+          // printf("%s", word);
           top = 0;
         } else if (!flag) {
           n.append(s[i]);
-          printf("%c", s[i]);
+          // printf("%c", s[i]);
         } else word[top++] = s[i];
       }
-      printf(" | ");
+      // printf(" | ");
       prod.push_back(n);
     }
-    printf("\n");
+    // printf("\n");
     fa[src] = prod;
   }
   return 1;
 }
 
 void csv(void) {
-  FILE *f = fopen("automata.csv", "w");
-  fprintf(f, "State");
-  fprintf(f, "\n");
+  FILE *f = fopen("first.csv", "w");
+  for (auto& s: frst) {
+    fprintf(f, "%s = {", s.first.c_str());
+    for (set<char>::iterator c = frst[s.first].begin(); c != frst[s.first].end(); c++)
+      fprintf(f, "%c%s", *c, next(c) != frst[s.first].end() ? ", " : "}\n");
+  }
+  fclose(f);
+  f = fopen("follow.csv", "w");
+  for (auto& s: fllw) {
+    fprintf(f, "%s = {", s.first.c_str());
+    for (set<char>::iterator c = fllw[s.first].begin(); c != fllw[s.first].end(); c++)
+      fprintf(f, "%c%s", *c, next(c) != fllw[s.first].end() ? ", " : "}\n");
+  }
   fclose(f);
 }
 
@@ -91,9 +101,8 @@ void first(void) {
 void printfrst() {
   for (auto& s: frst) {
     printf("%s = ", s.first.c_str());
-    for (auto& prod: s.second)
-      printf("%c, ", prod);
-    printf("\n");
+    for (set<char>::iterator c = frst[s.first].begin(); c != frst[s.first].end(); c++)
+      printf("%c%s", *c, next(c) != s.second.end() ? ", " : "\n");
   }}
 
 void follow(void) {
@@ -121,10 +130,10 @@ void follow(void) {
       vector<transition> prod = s.second;
       for (i = 0; i < (int) prod.size(); i++) {
         // prod[i] é uma produção de s.first
-        int last = prod.size() - 1;
+        int last = prod[i].sym.size() - 1;
         if (prod[i].sym[last].flag == NTERMINAL) {
           for (auto& fr: fllw[s.first])
-            if (fr != '&') done &= !fllw[prod[i].sym[last].t].insert(fr).second;
+            if (fr != '&')done &= !fllw[prod[i].sym[last].t].insert(fr).second;
           if (frst[prod[i].sym[last].t].find('&') != frst[prod[i].sym[last].t].end()
               && prod[i].sym[last - 1].flag == NTERMINAL)
             for (auto& fr: fllw[s.first])
@@ -134,9 +143,8 @@ void follow(void) {
 void printfllw() {
   for (auto& s: fllw) {
     printf("%s = ", s.first.c_str());
-    for (auto& prod: s.second)
-      printf("%c, ", prod);
-    printf("\n");
+    for (set<char>::iterator c = fllw[s.first].begin(); c != fllw[s.first].end(); c++)
+      printf("%c%s", *c, next(c) != s.second.end() ? ", " : "\n");
   }}
 
 void printfa() {
