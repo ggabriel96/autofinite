@@ -1,0 +1,115 @@
+\documentclass[12pt]{article}
+
+\usepackage{sbc-template}
+\usepackage{graphicx,url}
+\usepackage{listings}
+\usepackage{longtable}
+
+\usepackage[brazil]{babel}   
+%\usepackage[latin1]{inputenc}  
+\usepackage[utf8]{inputenc}  
+% UTF-8 encoding is recommended by ShareLaTex
+\usepackage{amsthm}
+
+\theoremstyle{definition}
+\newtheorem{defn}{Definição}[section]
+
+\sloppy
+
+\title{Construção de aplicação para geração dos conjuntos FIRST e FOLLOW a partir de uma GLC em linguagem C++}
+
+\author{Acácia dos Campos da Terra\inst{1}, Gabriel Batista Galli\inst{1},\\ João Pedro Winckler Bernardi\inst{1}, Vladimir Belinski\inst{1} }
+
+\address{Ciência da Computação -- Universidade Federal da Fronteira Sul
+  (UFFS)\\
+  Caixa Postal 181 -- 89.802-112 -- Chapecó -- SC -- Brasil
+  \email{\{terra.acacia, g7.galli96, winckler.joao, vlbelinski\}@gmail.com}
+}
+
+
+\begin{document} 
+
+\maketitle
+
+\begin{abstract}
+ This paper describes the implementation of an application in C++ programming language for the generation of sets FIRST and FOLLOW from a Context-Free Grammar (CFG). The particularities and operation of the application, such as its planning and code will be commented and analyzed in the work. At the end it will be checked the operation of the application by conducting tests.
+\end{abstract}
+     
+\begin{resumo} 
+ O presente trabalho descreve a implementação de uma aplicação em linguagem de programação C++ para a geração dos conjuntos FIRST e FOLLOW a partir de uma Gramática Livre de Contexto. As particularidades e funcionamento da aplicação, tal como seu planejamento e código serão comentados e analisados no trabalho. No final será verificado o funcionamento da aplicação através da realização de testes.
+
+\end{resumo}
+
+
+\section{Introdução}
+
+O presente trabalho objetiva descrever a construção de uma aplicação em linguagem de programação C++ para geração dos conjuntos FIRST e FOLLOW a partir de uma Gramática Livre de Contexto lida de um arquivo de entrada.
+
+Na Seção \ref{2} será realizada uma breve definição do que consistem os conjuntos FIRST  e FOLLOW. Por sua vez, na Seção \ref{3} será realizada uma descrição da aplicação, de seu planejamento e implementação. Em sequência, os testes que verificam seu funcionamento serão comentados na Seção \ref{4}. Por fim, na Seção \ref{5} poderão ser encontradas as conclusões acerca do trabalho.
+
+\section{Conjuntos FIRST e FOLLOW}
+\label{2}
+
+Conforme \cite{furtado} os conjuntos FIRST e FOLLOW podem ser definidos como:\newline
+
+\begin{defn}
+Seja $\alpha$ uma sequência qualquer gerada por $G$. Definimos como sendo $FIRST(\alpha)$ o conjunto de símbolos terminais que iniciam $\alpha$ ou sequências derivadas (direta ou indiretamente) de $\alpha.$
+\end{defn}
+
+Observações: Se $\alpha=\varepsilon$ ou $\alpha \Rightarrow^* \varepsilon$, então $\varepsilon \in FIRST(\alpha)$. \newline
+
+\begin{defn}
+Definimos $FOLLOW(A)$, para todo $A \in N$ como sendo o conjunto de símbolos terminais que podem aparecer imediatamente após $A$ em alguma forma sentencial de $G$.
+\end{defn}
+
+Observações: considere $N$ como sendo o conjunto finito de símbolos não-terminais.
+
+A descrição do cálculo dos conjuntos FIRST e FOLLOW pode ser verificado na descrição das funções \texttt{first} e \texttt{follow} apresentadas na Seção \ref{3}.
+
+\section{Descrição, Planejamento e Implementação da Aplicação}
+\label{3}
+
+A aplicação desenvolvida possui como objetivo a geração dos conjuntos FIRST e FOLLOW a partir de uma Gramática Livre de Contexto, em notação BNF, lida de um arquivo de entrada (texto). Após a geração dos conjuntos ambos são salvos em arquivos \texttt{.csv} separadamente. Cabe destacar que para a representação de $\varepsilon$ (épsilon) foi utilizado o símbolo $\&$.
+
+A implementação da aplicação pode ser encontrada em três arquivos: \texttt{ndfa.cpp}, \texttt{automata.h} e \texttt{automata.cpp}.
+
+No arquivo \texttt{ndfa.cpp} se encontra a função \texttt{main}, onde é realizada a leitura do arquivo de entrada, a impressão de mensagens no prompt a fim de permitir ao usuário o acompanhamento da aplicação e realizadas chamadas às funções responsáveis pelas ações executadas pela aplicação.
+
+Por sua vez, no arquivo \texttt{automata.h} podem ser encontradas as definições das constantes utilizadas no trabalho, das estruturas de dados e os protótipos das funções implementadas em \texttt{automata.cpp}. Cabe destacar que a \texttt{struct symbol} representa um símbolo de uma produção, tanto um terminal quanto um não terminal, sendo que existe uma flag que é setada para 1 quando for terminal e 2 caso contrário. A \texttt{struct transition} representa uma transição e é constituída em um vetor de símbolos.
+
+Em \texttt{automata.cpp} são encontradas  $7$ funções, as quais serão comentadas uma a uma a seguir.
+
+Inicialmente, em relação à função \texttt{readgrammar} tem-se que sua funcionalidade consiste na leitura de uma Gramática Livre de Contexto na notação BNF e construção de seu respectivo Autômato Finito, o qual poderá ser não determinístico.
+
+Por sua vez, a função \texttt{first} calcula os conjuntos FIRST da GLC passada como entrada, iterando sobre todas as transições de todos os estados. Se o primeiro símbolo da transição atual for terminal ou $\varepsilon$ o adiciono no conjunto FIRST do estado que está sendo analisado. Caso seja não-terminal ($*$) analiso todos os símbolos do conjunto FIRST desse não-terminal, adicionando o símbolo ao conjunto FIRST do estado inicialmente analisado caso seja um terminal e realizando o seguinte procedimento caso seja um $\varepsilon$: olhando para o próximo símbolo que segue o não terminal que levou a análise de seu conjunto FIRST, é adicionado o símbolo ao conjunto FIRST do estado inicialmente analisado caso esse seja um terminal, adicionado $\varepsilon$ se não houver mais nenhum símbolo e realizado todo o procedimento de tratamento de símbolo não-terminal a partir de ($*$) caso assim o seja. Tal processo é repetido até que nenhuma alteração nos conjuntos FIRST ocorra na iteração.
+
+No que lhe diz respeito, a função \texttt{follow} calcula os conjuntos FOLLOW da GLC passada como entrada, adicionando $\$$ (marca de final de sentença) no conjunto FOLLOW de `S' (símbolo inicial da gramática em questão) e também iterando sobre todas as transações de todos os estados. Consistindo em duas etapas, na primeira são ignorados os símbolos que dão nome a regra (os que precedem ::=) e analisados todos os não-terminais. Verificando o primeiro símbolo após um não-terminal: se esse for terminal o adiciono no conjunto FOLLOW do não-terminal que o antecede; se for não-terminal analiso o conjunto FIRST desse não-terminal e adiciono todos os terminais ($\varepsilon$ não é adicionado) no conjunto FOLLOW do não-terminal que o antecede; se não houver mais símbolos nada é feito. Essa etapa é realizada uma única vez.
+
+Na segunda etapa, a qual é repetida até que nenhuma alteração ocorra nos conjuntos FOLLOW na iteração, são analisados todos os não-terminais que correspondem ao último símbolo de suas produções. Nessa etapa, o FOLLOW desses símbolos passa a ser seu FOLLOW antigo somado ao FOLLOW do símbolo que dá nome a sua regra. Além disso, se $\varepsilon$ fizer parte do conjunto FIRST desse não-terminal e caso o símbolo que o antecede também seja um não-terminal então o FOLLOW desse não-terminal antecendente também será seu FOLLOW antigo somado ao FOLLOW do símbolo que dá nome a sua regra.
+
+A respeito da construção dos conjuntos também cabe destacar que é a estrutura global \texttt{map<string, set<char> > frst, fllw;} que mapeia um estado (a string) para um conjunto de caracteres (os símbolos) que compõem seus conjuntos FIRST e FOLLOW.
+
+Em relação à \texttt{printfirst} tem-se que sua funcionalidade consiste na impressão do conjunto FIRST gerado, enquanto que a função \texttt{printfllw} realiza a impressão do conjunto FOLLOW construído. A respeito da função \texttt{printfa} tem-se que ela realiza a impressão do autômato recebido como entrada em notação BNF.
+
+Por fim, a função \texttt{csv} salva o conjunto FIRST gerado em um arquivo denominado \texttt{first.csv} e o conjunto FOLLOW gerado em um arquivo denominado \texttt{follow.csv}.
+
+\section{Testes}
+\label{4}
+
+Para a realização dos testes foram criados quatro arquivos, nomeados \texttt{test.in}, \texttt{frst.in}, \texttt{frst2.in} e \texttt{frst3.in}. Cada um desses arquivos armazena uma Gramática Livre de Contexto a partir da qual foram gerados os conjuntos FIRST e FOLLOW relacionados a essa GLC.
+
+A partir da realização dos testes pôde ser verificado que os resultados obtidos condizem com as saídas esperadas, essas que podem ser verificadas em dois arquivos \texttt{.csv} gerados, um para o conjunto FIRST e outro para o conjunto FOLLOW. Isso demonstra que a aplicação construída atende aos objetivos a qual se propõe.
+
+\section{Conclusão}
+\label{5}
+
+Conclui-se que a aplicação desenvolvida atende ao objetivo ao qual se propõe, consistindo em uma aplicação em linguagem de programação C++ para geração dos conjuntos FIRST e FOLLOW a partir de uma Gramática Livre de Contexto (GLC).
+
+No trabalho foi apresentada uma definição do que consistem os conjuntos FIRST e FOLLOW, assim como realizada a exposição do planejamento, funcionamento, particularidades e implementação de uma aplicação para sua geração.
+
+Por fim, foram citados e comentados os arquivos utilizados nos testes para a verificação da funcionalidade da aplicação desenvolvida.
+
+\bibliographystyle{sbc}
+\bibliography{sbc-template}
+
+\end{document}
