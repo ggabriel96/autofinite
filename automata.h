@@ -6,8 +6,6 @@ using namespace std;
 #define MAX 112345
 #define TERMINAL 1
 #define NTERMINAL 2
-#define EPS '&'
-#define S "S"
 
 struct symbol {
   string t; int flag;
@@ -23,6 +21,9 @@ struct symbol {
 
 struct transition {
   vector<symbol> sym;
+  void append(symbol s) {
+    sym.push_back(s);
+  }
   void append(char c) {
     sym.push_back(symbol(c));
   }
@@ -33,12 +34,8 @@ struct transition {
 
 typedef map<string, vector<transition> > FA;
 
-void csv();
-
 // Read the grammar and build the NDFA
-int readgrammar();
-void first();
-void printfrst();
-void follow();
-void printfllw();
-void printfa();
+int readgrammar(FA &);
+FA makedet(FA &);
+void printfa(FA &);
+void csv();

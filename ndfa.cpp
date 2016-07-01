@@ -2,15 +2,18 @@
 #include "automata.h"
 
 int main(void) {
-  readgrammar();
-  printf("Automaton:\n");
-  printfa();
-  printf("\n------------------\nFirst set:\n");
-  first();
-  printfrst();
-  printf("\n------------------\nFollow set:\n");
-  follow();
-  printfllw();
-  csv();
+  int N;
+  FA fa;
+  FA dfa;
+  while (scanf("%d\n", &N) != EOF) {
+    // if (N && readtokens(N)) continue;
+    if (readgrammar(fa)) continue;
+    printf("Invalid input\n"); break;
+  }
+  printf("Original automaton:\n");
+  printfa(fa);
+  printf("\nAfter determinization:\n");
+  dfa = makedet(fa);
+  printfa(dfa);
   return 0;
 }
